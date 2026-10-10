@@ -1,8 +1,10 @@
 {
+  "id": "abska-app-v2",
   "name": "ABSKA — 214 يومًا",
   "short_name": "ABSKA",
   "description": "نظام التحوّل الشامل وإدارة الحياة خلال 214 يومًا",
-  "start_url": "./index.html",
+  "start_url": "./index.html?v=2",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0B0B0D",
