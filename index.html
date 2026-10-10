@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0B0B0D">
+  <meta name="description" content="نظام التحول الشخصي الشامل - 214 يوماً">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon.svg">
+  <title>ABSKA — 214 يومًا</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- شريط الإشعارات الداخلية والتنبيهات -->
+  <div id="toast" class="toast-hidden" role="alert"></div>
+
+  <!-- الهيدر الرئيسي -->
+  <header class="app-header">
+    <div class="header-branding">
+      <div class="logo-mark">A214</div>
+      <div class="branding-text">
+        <h1 class="logo-title">ABSKA</h1>
+        <span class="logo-subtitle">التحوّل الشامل</span>
+      </div>
+    </div>
+    <div class="header-status">
+      <button id="hard-mode-toggle" class="btn-icon" title="وضع اليوم الصعب">
+        <span class="icon">🛡️</span>
+      </button>
+      <div class="header-badge" id="header-day-badge">اليوم --</div>
+      <div class="header-badge xp-badge" id="header-xp-badge">0 XP</div>
+    </div>
+  </header>
+
+  <!-- الحاوية الأساسية للشاشات -->
+  <main id="app-container">
+
+    <!-- 1. شاشة الإعداد الأولي (Onboarding) -->
+    <section id="view-onboarding" class="view hidden">
+      <div class="card onboarding-card">
+        <div class="badge-tag">البداية الحقيقية</div>
+        <h2 class="view-title">ميثاق الانطلاق: 214 يومًا نحو التحوّل</h2>
+        <p class="text-muted">الاستمرارية تبدأ بالوضوح. املأ بياناتك الأساسية لتخصيص خطتك التراكمية. يمكنك تعديل هذه البيانات لاحقًا.</p>
+
+        <form id="onboarding-form" class="form-layout">
+          <div class="form-group">
+            <label for="ob-name">الاسم أو اللقب</label>
+            <input type="text" id="ob-name" required placeholder="مثال: عباس" autocomplete="off">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="ob-age">العمر / سنة الميلاد</label>
+              <input type="number" id="ob-age" placeholder="مثال: 22">
+            </div>
+            <div class="form-group">
+              <label for="ob-height">الطول (سم)</label>
+              <input type="number" id="ob-height" placeholder="مثال: 175">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="ob-weight">الوزن الابتدائي (اختياري)</label>
+              <input type="number" step="0.1" id="ob-weight" placeholder="كجم">
+            </div>
+            <div class="form-group">
+              <label for="ob-difficulty">مستوى التدرج المفضل</label>
+              <select id="ob-difficulty">
+                <option value="easy">متدرج وهادئ (الأولوية لتثبيت الروتين)</option>
+                <option value="medium" selected>متوازن (تحدي واقعي ومستمر)</option>
+                <option value="hard">عالي الكثافة (انضباط صارم)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="ob-focus">المجالات ذات الأولوية الأولى</label>
+            <input type="text" id="ob-focus" placeholder="مثال: الانضباط، الرياضة، القراءة، بناء المشاريع">
+          </div>
+
+          <div class="form-group">
+            <label for="ob-letter">رسالة اليوم الأول (تُغلق حتى اليوم 214)</label>
+            <textarea id="ob-letter" rows="4" placeholder="اكتب وعدك لنفسك: لماذا تبدأ؟ ما الذي تريده بعد 214 يومًا؟"></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block">ابدأ رحلتي (تثبيت اليوم الأول)</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 2. لوحة القيادة (Dashboard) -->
+    <section id="view-dashboard" class="view">
+      <!-- بطاقة اليوم والتقدم الزمني -->
+      <div class="card hero-card">
+        <div class="hero-top">
+          <div>
+            <span class="text-muted" id="user-greeting">مرحبًا بك</span>
+            <h2 class="hero-day" id="dashboard-day-num">اليوم 1 <span class="hero-total">/ 214</span></h2>
+          </div>
+          <div class="streak-box">
+            <span class="streak-flame">🔥</span>
+            <span class="streak-count" id="streak-count">0</span>
+            <span class="streak-label">أيام متصلة</span>
+          </div>
+        </div>
+
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" id="journey-progress-bar" style="width: 0%;"></div>
+        </div>
+        <div class="progress-meta">
+          <span id="journey-percent">0% مكتمل</span>
+          <span id="days-remaining">باقي 214 يومًا</span>
+        </div>
+
+        <div class="level-indicator">
+          <span class="badge-outline" id="user-title">المبتدئ الواعي</span>
+          <span class="text-muted" id="user-level">المستوى 1</span>
+        </div>
+      </div>
+
+      <!-- الإجراءات السريعة ومؤشر الطاقة -->
+      <div class="quick-actions-grid">
+        <button class="action-card" id="btn-quick-energy">
+          <span class="action-icon">⚡</span>
+          <span class="action-title">تسجيل الطاقة</span>
+          <span class="action-desc" id="current-energy-val">لم يُسجل</span>
+        </button>
+
+        <button class="action-card" id="btn-quick-rescue">
+          <span class="action-icon">🧭</span>
+          <span class="action-title">العودة للمسار</span>
+          <span class="action-desc">نظام الإنقاذ</span>
+        </button>
+
+        <button class="action-card" id="btn-quick-journal">
+          <span class="action-icon">✍️</span>
+          <span class="action-title">تدوين سريع</span>
+          <span class="action-desc">دفتر الذات</span>
+        </button>
+
+        <button class="action-card" id="btn-quick-time">
+          <span class="action-icon">⏱️</span>
+          <span class="action-title">تنظيم الوقت</span>
+          <span class="action-desc">سجل النشاط</span>
+        </button>
+      </div>
+
+      <!-- المهام اليومية المصغرة -->
+      <div class="section-block">
+        <div class="section-header">
+          <h3 class="section-title">مهام اليوم الحالية</h3>
+          <button class="btn-text" id="btn-goto-tasks">عرض الكل</button>
+        </div>
+        <div id="dashboard-tasks-list" class="task-items-list">
+          <!-- تُحقن المهام عبر جافاسكريبت -->
+        </div>
+      </div>
+
+      <!-- بطاقة المرحلة الحالية والتحدي -->
+      <div class="card stage-card">
+        <div class="badge-tag" id="current-phase-tag">المرحلة الأولى: التأسيس</div>
+        <h4 id="current-phase-title">بناء الإيقاع الأساسي وتقليل التشتت</h4>
+        <p class="text-muted" id="current-phase-desc">التركيز على تثبيت أوقات الاستيقاظ وإنجاز الحد الأدنى اليومي بدون تسويف.</p>
+        <div class="stage-footer">
+          <span class="text-muted" id="phase-countdown">الأيام 1 – 30</span>
+          <button class="btn-secondary btn-sm" id="btn-view-contract">عقد المرحلة</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. إدارة المهام (Tasks) -->
+    <section id="view-tasks" class="view hidden">
+      <div class="view-header">
+        <h2 class="view-title">نظام المهام المتدرج</h2>
+        <button class="btn btn-primary btn-sm" id="btn-open-task-modal">+ مهمة جديدة</button>
+      </div>
+
+      <!-- لوحة التكيّف الذكي -->
+      <div id="smart-adaptation-alert" class="card card-warning hidden">
+        <div class="alert-icon">💡</div>
+        <div class="alert-content">
+          <h4>التكيّف الذكي بالقواعد المحلية</h4>
+          <p id="smart-adaptation-text">بناءً على سجلاتك السابقة، يقترح النظام تخفيف وتيرة المهام اليوم لحمايتك من الاستنزاف.</p>
+          <div class="alert-actions">
+            <button class="btn-sm btn-primary" id="btn-apply-adaptation">تطبيق الاقتراح</button>
+            <button class="btn-sm btn-secondary" id="btn-dismiss-adaptation">تجاهل</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-tabs">
+        <button class="filter-btn active" data-filter="all">الكل</button>
+        <button class="filter-btn" data-filter="fitness">الجسم</button>
+        <button class="filter-btn" data-filter="knowledge">المعرفة</button>
+        <button class="filter-btn" data-filter="skills">المهارات</button>
+        <button class="filter-btn" data-filter="discipline">الانضباط</button>
+      </div>
+
+      <div id="all-tasks-list" class="task-items-list">
+        <!-- قائمة المهام الكاملة -->
+      </div>
+    </section>
+
+    <!-- 4. خريطة رحلة الـ214 يومًا (Journey Map) -->
+    <section id="view-journey" class="view hidden">
+      <div class="view-header">
+        <h2 class="view-title">خريطة الـ214 يومًا</h2>
+        <span class="text-muted">8 مراحل تحوّل تراكمية</span>
+      </div>
+
+      <div class="stages-breakdown">
+        <div class="phase-card-pill" data-phase="1">المرحلة 1 (1-30)</div>
+        <div class="phase-card-pill" data-phase="2">المرحلة 2 (31-60)</div>
+        <div class="phase-card-pill" data-phase="3">المرحلة 3 (61-90)</div>
+        <div class="phase-card-pill" data-phase="4">المرحلة 4 (91-120)</div>
+        <div class="phase-card-pill" data-phase="5">المرحلة 5 (121-150)</div>
+        <div class="phase-card-pill" data-phase="6">المرحلة 6 (151-180)</div>
+        <div class="phase-card-pill" data-phase="7">المرحلة 7 (181-210)</div>
+        <div class="phase-card-pill" data-phase="8">الختام (211-214)</div>
+      </div>
+
+      <div class="journey-grid-container card">
+        <div class="grid-legend">
+          <span class="legend-item"><span class="legend-dot dot-done"></span> مكتمل</span>
+          <span class="legend-item"><span class="legend-dot dot-today"></span> اليوم</span>
+          <span class="legend-item"><span class="legend-dot dot-empty"></span> مسجل جزئياً</span>
+          <span class="legend-item"><span class="legend-dot dot-locked"></span> قادم</span>
+        </div>
+        <div id="journey-214-grid" class="days-matrix">
+          <!-- توليد 214 مربعًا برمجياً -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. شجرة تطوير الشخصية (Tree of Growth) -->
+    <section id="view-tree" class="view hidden">
+      <div class="view-header">
+        <h2 class="view-title">شجرة تطوير الشخصية</h2>
+        <span class="text-muted">7 مسارات نمو متوازية</span>
+      </div>
+
+      <div class="tree-grid" id="personality-tree-container">
+        <!-- المسارات السبعة -->
+      </div>
+    </section>
+
+    <!-- 6. القراءة والمعرفة (Books) -->
+    <section id="view-books" class="view hidden">
+      <div class="view-header">
+        <h2 class="view-title">المكتبة والتطبيق العملي</h2>
+        <button class="btn btn-primary btn-sm" id="btn-add-book">+ كتاب جديد</button>
+      </div>
+      <div id="books-list" class="cards-list"></div>
+    </section>
+
+    <!-- 7. المهارات والمشاريع (Skills & Projects) -->
+    <section id="view-skills" class="view hidden">
+      <div class="view-header">
+        <h2 class="view-title">مشاريع المهارات العملية</h2>
+        <button class="btn btn-primary btn-sm" id="btn-add-skill">+ مشروع جديد</button>
+      </div>
+      <div id="skills-list" class="cards-list"></div>
+    </section>
+
+    <!-- 8. دفتر اكتشاف الذات (Journal) -->
+    <section id="view-journal" class="view hidden">
+      <div class="view-header">
+        <h2 class="view-title">دفتر اكتشاف الذات</h2>
+        <button class="btn btn-primary btn-sm" id="btn-add-journal">+ تدوينة تأمل</button>
+      </div>
+      <div id="journal-list" class="cards-list"></div>
+    </section>
+
+    <!-- 9. الجسم والنشاط (Body & Fitness) -->
+    <section id="view-body" class="view hidden">
+      <div class="view-header">
+        <h2 class="view-title">الجسم والنشاط البدني</h2>
+        <button class="btn btn-primary btn-sm" id="btn-log-body">+ تسجيل قياس / نشاط</button>
+      </div>
+      <div class="card">
+        <h3>سجل القياسات والنشاط</h3>
+        <div id="body-metrics-chart" class="svg-chart-container"></div>
+      </div>
+      <div id="body-logs-list" class="cards-list"></div>
+    </section>
+
+    <!-- 10. التقارير والرسوم البيانية (Reports) -->
+    <section id="view-reports" class="view hidden">
+      <div class="view-header">
+        <h2 class="view-title">التحليلات والمقياس الشامل</h2>
+        <span class="text-muted">مبني على البيانات الفعلية</span>
+      </div>
+
+      <div class="card">
+        <h3>معدل إنجاز المهام الأسبوعي</h3>
+        <div id="chart-tasks-weekly" class="svg-chart-container"></div>
+      </div>
+
+      <div class="card">
+        <h3>تحليل أسباب التعثر المسجلة</h3>
+        <div id="friction-analysis-block">
+          <p class="text-muted">لا توجد بيانات تعثر كافية حالياً لتقديم استنتاجات واقعية.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>الصور التوثيقية للمراحل (محلياً فقط)</h3>
+        <input type="file" id="input-phase-photo" accept="image/*" class="hidden">
+        <button class="btn btn-secondary btn-sm" id="btn-upload-photo">إضافة صورة مرحلية</button>
+        <div id="phase-photos-gallery" class="photos-gallery"></div>
+      </div>
+    </section>
+
+    <!-- 11. رسالة اليوم 214 وخطة الاستمرار -->
+    <section id="view-post214" class="view hidden">
+      <div class="view-header">
+        <h2 class="view-title">الختام وما بعد 214 يومًا</h2>
+      </div>
+      <div class="card" id="sealed-letter-card">
+        <h3>رسالة من نفسك في اليوم الأول</h3>
+        <div id="sealed-letter-content" class="sealed-box">
+          <p class="text-muted">هذه الرسالة مغلقة بإحكام حتى بلوغ اليوم 214.</p>
+        </div>
+      </div>
+      <div class="card">
+        <h3>خطة الاستمرار لـ 30 يومًا قادمة</h3>
+        <p class="text-muted">تثبيت العادات الأكثر تأثيراً وتحويل النظام إلى نمط حياة مستدام مدى الحياة.</p>
+        <textarea id="post214-plan" rows="5" class="form-control" placeholder="اكتب خطة الاستمرار بعد الرحلة..."></textarea>
+        <button class="btn btn-primary btn-sm mt-2" id="btn-save-postplan">حفظ الخطة</button>
+      </div>
+    </section>
+
+    <!-- 12. الإعدادات والنسخ الاحتياطي (Settings & Backup) -->
+    <section id="view-settings" class="view hidden">
+      <div class="view-header">
+        <h2 class="view-title">الإعدادات وإدارة البيانات</h2>
+      </div>
+
+      <div class="card">
+        <h3>النسخ الاحتياطي المحلي</h3>
+        <p class="text-muted">بياناتك ملكك بالكامل ومخزنة في متصفح جهازك عبر IndexedDB دون إرسال أي معلومة إلى أي خادم خارجي.</p>
+        <div class="button-group">
+          <button class="btn btn-primary" id="btn-export-backup">تصدير نسخة احتياطية (JSON)</button>
+          <label class="btn btn-secondary" for="import-file-input">استيراد نسخة احتياطية</label>
+          <input type="file" id="import-file-input" accept=".json" class="hidden">
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>تعديل الملف الشخصي</h3>
+        <form id="settings-profile-form">
+          <div class="form-group">
+            <label>الاسم</label>
+            <input type="text" id="settings-name">
+          </div>
+          <div class="form-group">
+            <label>مستوى الصعوبة</label>
+            <select id="settings-difficulty">
+              <option value="easy">متدرج وهادئ</option>
+              <option value="medium">متوازن</option>
+              <option value="hard">عالي الكثافة</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-secondary btn-sm">حفظ التعديلات</button>
+        </form>
+      </div>
+
+      <div class="card danger-card">
+        <h3>إعادة ضبط النظام</h3>
+        <p class="text-muted">سيؤدي هذا إلى مسح كافة البيانات المخزنة محلياً والبدء من جديد. تأكد من أخذ نسخة احتياطية أولاً.</p>
+        <button class="btn btn-danger btn-sm" id="btn-reset-db">إعادة ضبط كاملة</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- القائمة السفلية للتنقل (Bottom Navigation Bar) -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-view="dashboard">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">الرئيسية</span>
+    </button>
+    <button class="nav-item" data-view="tasks">
+      <span class="nav-icon">📋</span>
+      <span class="nav-label">المهام</span>
+    </button>
+    <button class="nav-item" data-view="journey">
+      <span class="nav-icon">🗺️</span>
+      <span class="nav-label">الخريطة</span>
+    </button>
+    <button class="nav-item" data-view="tree">
+      <span class="nav-icon">🌳</span>
+      <span class="nav-label">الشجرة</span>
+    </button>
+    <button class="nav-item" id="nav-btn-more">
+      <span class="nav-icon">☰</span>
+      <span class="nav-label">المزيد</span>
+    </button>
+  </nav>
+
+  <!-- النافذة المنبثقة للقائمة الموسعة (More Drawer Modal) -->
+  <div id="modal-more" class="modal hidden">
+    <div class="modal-content modal-drawer">
+      <div class="modal-header">
+        <h3>كافة أقسام ABSKA</h3>
+        <button class="btn-close" id="btn-close-more">&times;</button>
+      </div>
+      <div class="drawer-grid">
+        <button class="drawer-item" data-view="books">📚 القراءة والمعرفة</button>
+        <button class="drawer-item" data-view="skills">🛠️ المهارات والمشاريع</button>
+        <button class="drawer-item" data-view="journal">📖 دفتر اكتشاف الذات</button>
+        <button class="drawer-item" data-view="body">💪 الجسم والنشاط</button>
+        <button class="drawer-item" data-view="reports">📊 التحليلات والتقارير</button>
+        <button class="drawer-item" data-view="post214">✉️ رسالة 214 والاستمرار</button>
+        <button class="drawer-item" data-view="settings">⚙️ الإعدادات والنسخ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- نافذة إضافة مهمة (Modal Task) -->
+  <div id="modal-task" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-task-title">إضافة مهمة جديدة</h3>
+        <button class="btn-close" id="btn-close-task-modal">&times;</button>
+      </div>
+      <form id="form-task">
+        <input type="hidden" id="task-id">
+        <div class="form-group">
+          <label for="task-title">عنوان المهمة</label>
+          <input type="text" id="task-title" required placeholder="مثال: قراءة 15 صفحة من كتاب...">
+        </div>
+        <div class="form-group">
+          <label for="task-desc">الوصف / ملاحظة</label>
+          <textarea id="task-desc" rows="2"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="task-domain">المجال</label>
+            <select id="task-domain">
+              <option value="fitness">الجسم واللياقة</option>
+              <option value="discipline">الانضباط والاستمرارية</option>
+              <option value="knowledge">المعرفة والقراءة</option>
+              <option value="skills">المهارات والمشاريع</option>
+              <option value="time">تنظيم الوقت</option>
+              <option value="self">اكتشاف الذات</option>
+              <option value="habits">العادات والروحية</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="task-difficulty">الصعوبة</label>
+            <select id="task-difficulty">
+              <option value="1">بسيطة (10 XP)</option>
+              <option value="2" selected>متوسطة (20 XP)</option>
+              <option value="3">عميقة (40 XP)</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary">حفظ المهمة</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- نافذة تسجيل الطاقة (Modal Energy) -->
+  <div id="modal-energy" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>مستوى الطاقة اليومي</h3>
+        <button class="btn-close" id="btn-close-energy">&times;</button>
+      </div>
+      <div class="energy-selector">
+        <button class="energy-btn" data-energy="low">
+          <span class="energy-icon">🪫</span>
+          <span>منخفض</span>
+        </button>
+        <button class="energy-btn" data-energy="medium">
+          <span class="energy-icon">🔋</span>
+          <span>متوسط</span>
+        </button>
+        <button class="energy-btn" data-energy="high">
+          <span class="energy-icon">⚡</span>
+          <span>مرتفع</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- نافذة الإنقاذ والعودة إلى المسار (Modal Rescue) -->
+  <div id="modal-rescue" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>العودة إلى المسار (نظام الإنقاذ)</h3>
+        <button class="btn-close" id="btn-close-rescue">&times;</button>
+      </div>
+      <div class="rescue-body">
+        <p class="text-muted">التعثر خطوة طبيعية في مسار الـ214 يومًا. ما حدث قد حدث، والعودة اليوم بخطوة واحدة أصغر تساوي استمرار الرحلة كاملة.</p>
+        <div class="form-group">
+          <label>ما السبب الأساسي للانقطاع؟</label>
+          <div class="checkbox-group">
+            <label><input type="checkbox" name="rescue-reason" value="energy"> استنزاف الطاقة / إرهاق</label>
+            <label><input type="checkbox" name="rescue-reason" value="time"> ضيق الوقت والظروف المفاجئة</label>
+            <label><input type="checkbox" name="rescue-reason" value="distraction"> التشتت الرقمي / التسويف</label>
+            <label><input type="checkbox" name="rescue-reason" value="difficulty"> المهام كانت أصعب من المتاح</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>اختر خطوة واحدة مصغرة لليوم للعودة فوراً:</label>
+          <input type="text" id="rescue-micro-step" class="form-control" placeholder="مثال: شرب كوب ماء والمشي 5 دقائق وقراءة صفحة واحدة.">
+        </div>
+        <button class="btn btn-primary btn-block" id="btn-confirm-rescue">اعتماد العودة الآن (+15 XP)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- السكريبتات الأساسية المترابطة -->
+  <script src="js/db.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
